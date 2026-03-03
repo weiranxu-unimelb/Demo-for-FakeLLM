@@ -1,0 +1,4 @@
+{"logtail":{"client_time":"2026-03-03T11:54:54.478856963Z","proc_id":2174976744,"proc_seq":126},"metrics":"N40controlclient_auto_status_queuedS0204N18profiles_newS0402N24profiles_migrationS0602N34profiles_migration_successS0802N46gauge_dns_manager_linux_mode_directS0a02","text":"tailscaled got signal terminated; shutting down\n"}
+{"logtail":{"client_time":"2026-03-03T11:54:54.47960563Z","proc_id":2174976744,"proc_seq":127},"text":"control: client.Shutdown ...\n"}
+{"logtail":{"client_time":"2026-03-03T11:54:54.479784547Z","proc_id":2174976744,"proc_seq":128},"text":"control: updateRoutine: exiting\n"}
+{"logtail":{"client_time":"2026-03-03T11:54:54.482750463Z","proc_id":2174976744,"proc_seq":129},"v":1,"text":"control: mapRoutine: context done.\n"}
