@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createUser,
   fetchUsers,
@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [docsLoading, setDocsLoading] = useState(true);
   const [docError, setDocError] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<DocumentDetail | null>(null);
+  const docFileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -262,8 +263,25 @@ export default function AdminDashboard() {
               className="input"
               type="file"
               accept=".txt"
+              ref={docFileInputRef}
               onChange={handleUploadDoc}
             />
+            {docFileInputRef.current?.files?.[0] && (
+              <div style={{ marginTop: 8, fontSize: 13 }}>
+                <span>待上传：{docFileInputRef.current.files[0].name}</span>
+                <button
+                  type="button"
+                  style={{ marginLeft: 8, fontSize: 12, padding: "4px 8px" }}
+                  onClick={() => {
+                    if (docFileInputRef.current) {
+                      docFileInputRef.current.value = "";
+                    }
+                  }}
+                >
+                  取消选择
+                </button>
+              </div>
+            )}
           </div>
           {docError && (
             <div style={{ color: "red", fontSize: 13, marginBottom: 8 }}>

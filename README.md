@@ -77,6 +77,55 @@ VITE_API_BASE_URL=https://your-api-domain.com
 
 ---
 
+## 二点五、Docker 打包与跨平台部署（macOS 开发 → Ubuntu 上线）
+
+### 1. 为什么可行
+
+- 你在 macOS 上开发没问题；
+- 通过 Docker 构建出来的是 **Linux 容器镜像**，可以直接在 Ubuntu 服务器运行；
+- 注意点只有一个：**Mac 可能是 Apple Silicon（arm64），而服务器通常是 x86_64（amd64）**，需要用 buildx 构建 `linux/amd64` 镜像。
+
+### 2. 本地用 Docker 一键启动（最简单）
+
+在仓库根目录：
+
+```bash
+docker compose up --build
+```
+
+- 前端：`http://localhost:5173`
+- 后端：`http://localhost:8000/health`
+
+> 这个 compose 默认使用容器内 SQLite（演示用）。生产建议切 PostgreSQL（见下方“数据库与并发能力说明”）。
+
+### 3. 在 macOS 上构建用于 Ubuntu 的镜像（linux/amd64）
+
+```bash
+docker buildx create --use
+
+# 后端镜像
+docker buildx build --platform linux/amd64 -t fakellm-backend:latest ./backend
+
+# 前端镜像
+docker buildx build --platform linux/amd64 -t fakellm-frontend:latest ./frontend
+```
+
+如果你要推到你自己的镜像仓库（推荐），把 `-t` 改成 `your-registry.com/xxx:tag`，并在命令后加 `--push`。
+
+### 4. Ubuntu 服务器部署（最小步骤）
+
+1. 在 Ubuntu 安装 Docker / Docker Compose
+2. 把本仓库拷到服务器（或只拷 `docker-compose.yml` + 镜像）
+3. 在服务器运行：
+
+```bash
+docker compose up -d
+```
+
+如果你用了镜像仓库（更推荐），则在服务器 `docker pull` 后再 `docker compose up -d`。
+
+---
+
 ## 三、使用流程说明
 
 ### 1. 管理员分配账号

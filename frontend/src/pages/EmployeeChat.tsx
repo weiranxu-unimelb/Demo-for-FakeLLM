@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { askQuestion, Question } from "../api";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,7 @@ export default function EmployeeChat() {
   const [image, setImage] = useState<File | undefined>();
   const [history, setHistory] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,6 +19,9 @@ export default function EmployeeChat() {
       setHistory((prev) => [...prev, q]);
       setText("");
       setImage(undefined);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (err) {
       console.error(err);
       alert("提问失败，请确认已登录并稍后重试。");
@@ -55,6 +59,7 @@ export default function EmployeeChat() {
               <label className="form-label">上传现场照片（可选，用于辅助理解）</label>
               <input
                 className="input"
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
@@ -68,7 +73,12 @@ export default function EmployeeChat() {
                   <button
                     type="button"
                     style={{ marginLeft: 8, fontSize: 12, padding: "4px 8px" }}
-                    onClick={() => setImage(undefined)}
+                    onClick={() => {
+                      setImage(undefined);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                      }
+                    }}
                   >
                     取消图片
                   </button>

@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      # 默认用容器内 SQLite；生产建议改成 PostgreSQL（见 README）
+      - DATABASE_URL=sqlite:////app/app.db
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # 前端在容器内通过 nginx 反代 /api 到 backend
+        - VITE_API_BASE_URL=/api
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
