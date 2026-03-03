@@ -34,8 +34,9 @@ def login(
 
 def init_default_admins(db: Session) -> None:
     # 超级管理员：用于兜底管理，不允许在系统内被禁用或降级
-    superadmin = db.query(User).filter(User.role == "superadmin").first()
-    if not superadmin:
+    # 这里以用户名为准，避免因为手动改角色导致重复插入
+    superadmin = db.query(User).filter(User.username == "superadmin").first()
+    if superadmin is None:
         root = User(
             username="superadmin",
             hashed_password=get_password_hash("superadmin123"),
@@ -44,20 +45,34 @@ def init_default_admins(db: Session) -> None:
         )
         db.add(root)
         db.commit()
+    else:
+        # 如果 superadmin 曾被误改角色/禁用，这里启动时自动纠正
+        changed = False
+        if superadmin.role != "superadmin":
+            superadmin.role = "superadmin"
+            changed = True
+        if not superadmin.is_active:
+            superadmin.is_active = True
+            changed = True
+        if changed:
+            db.commit()
 
     # 普通管理员：方便日常使用，可以被其它管理员调整角色
-    admin = db.query(User).filter(User.role == "admin").first()
-    if not admin:
-        default_username = "admin"
-        default_password = "admin123"
+    admin = db.query(User).filter(User.username == "admin").first()
+    if admin is None:
         user = User(
-            username=default_username,
-            hashed_password=get_password_hash(default_password),
+            username="admin",
+            hashed_password=get_password_hash("admin123"),
             role="admin",
             is_active=True,
         )
         db.add(user)
         db.commit()
+    else:
+        # 如果 admin 被禁用，启动时自动启用（避免管理员全部失效）
+        if not admin.is_active:
+            admin.is_active = True
+            db.commit()
 
 
 def init_db() -> None:

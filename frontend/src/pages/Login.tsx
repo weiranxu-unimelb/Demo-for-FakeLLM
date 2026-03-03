@@ -28,7 +28,7 @@ export default function LoginPage() {
       setAuthToken(res.access_token);
       localStorage.setItem("token", res.access_token);
       const role = decodeRoleFromToken(res.access_token);
-      if (role === "admin") {
+      if (role === "admin" || role === "superadmin") {
         navigate("/admin", { replace: true });
       } else {
         navigate("/chat", { replace: true });
