@@ -7,3 +7,5 @@ passlib>=1.7.4
 python-multipart>=0.0.9
 requests>=2.32.0
 openai>=1.0.0
+# 专业向量数据库（业界标准 RAG 工具）
+chromadb-client>=0.5.0

@@ -38,3 +38,18 @@ class Document(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")
+
+
+class DocumentChunk(Base):
+    """存储文档分块及其向量嵌入（JSON 格式），用于 RAG 语义检索。"""
+    __tablename__ = "document_chunks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    doc_id = Column(Integer, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
+    chunk_index = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)          # 文本原文
+    embedding = Column(Text, nullable=False)         # 向量（JSON 序列化的 float 列表）
+
+    document = relationship("Document", back_populates="chunks")
+

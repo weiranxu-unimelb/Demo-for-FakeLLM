@@ -3,10 +3,30 @@ services:
     build:
       context: ./backend
     environment:
-      # 默认用容器内 SQLite；生产建议改成 PostgreSQL（见 README）
-      - DATABASE_URL=sqlite:////app/app.db
+      # SQLite 数据库持久化到 Docker volume，重建容器不丢失数据
+      - DATABASE_URL=sqlite:////data/app.db
+      # ChromaDB 连接地址
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      # 模型
+      - MODEL_NAME=qwen2.5vl:7b # 用于本地调试
+      # - MODEL_NAME=qwen2.5vl:32b  # 用于生产
+    volumes:
+      - backend_data:/data # SQLite 持久化
     ports:
       - "8000:8000"
+    depends_on:
+      - chromadb
+
+  # 专业向量数据库：RAG 语义检索的核心工具
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chromadb
+    restart: unless-stopped
+    volumes:
+      - chroma_data:/chroma/chroma
+    ports:
+      - "8001:8000"
 
   frontend:
     build:
@@ -67,3 +87,5 @@ services:
 
 volumes:
   ollama_data:
+  chroma_data: # ChromaDB 向量数据持久化
+  backend_data: # SQLite 数据库持久化（用户账号、知识库文档）
