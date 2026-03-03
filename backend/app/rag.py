@@ -5,9 +5,9 @@ from openai import OpenAI
 # 初始化 OpenAI 客户端，指向本地的 Ollama 代理
 # 我们使用服务名称 "ollama" 因为它们在同一个 docker-compose 网络中
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434/v1")
-# 使用多模态模型以支持图片，例如 qwen2.5-vl 或者 llava 相关模型。
-# 注意：Ollama 里跑多模态需要对应的模型（比如 llava/qwen2.5-vl 等）。假设模型名为 qwen2.5:7b (需支持视觉) 或 llava。
-MODEL_NAME = os.getenv("MODEL_NAME", "llava")
+# 使用多模态模型以支持图片，例如 llama3.2-vision 或者 llava 相关模型。
+# 注意：Ollama 里跑多模态需要对应的模型（目前支持中文较好的是 llama3.2-vision）。
+MODEL_NAME = os.getenv("MODEL_NAME", "llama3.2-vision")
 
 client = OpenAI(
     base_url=OLLAMA_BASE_URL,

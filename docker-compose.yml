@@ -38,32 +38,32 @@ services:
     # 简化版：移除 deploy 块以确保在任意机器上至少能用 CPU 跑（虽然慢）。
     # 这里先不加 deploy 块，或者提示用户如果要用到英伟达 GPU 需要安装 nvidia-container-toolkit。
 
-    # 提供代理服务（替代VPN），通过 WebSocket 插件使用 HTTP/HTTPS 端口
-    # 这允许我们使用 Ngrok 的"免费 HTTP 静态域名"来穿透纯 TCP 代理流量
-  shadowsocks:
-    image: acrisliu/shadowsocks-libev:latest
-    container_name: shadowsocks
-    environment:
-      - SERVER_PORT=8388
-      - PASSWORD=fakellm-demo-pwd # 客户端连接密码
-      - METHOD=aes-256-gcm
-      - ARGS=--plugin v2ray-plugin --plugin-opts "server"
-    ports:
-      - "8388:8388"
-    restart: unless-stopped
+    # =====================================================================
+    # 以下两个服务（shadowsocks + ngrok）用于【公网穿透】场景
+    # 当部署在国企内网时不需要，已注释掉。如需远程访问，取消以下注释并配置 .env
+    # =====================================================================
 
-  # 内网穿透服务：将本地的 WebSocket 代理端口暴露到 Ngrok 免费 HTTPS 域名
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok
-    restart: unless-stopped
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
-    # 使用 ngrok 的 http 穿透功能（支持 WebSocket），并在后台绑定你的免费静态域名
-    # 替换下面的域名为你获取到的免费域名
-    command: "http shadowsocks:8388 --domain=${NGROK_DOMAIN}"
-    depends_on:
-      - shadowsocks
+    # shadowsocks:
+    #   image: acrisliu/shadowsocks-libev:latest
+    #   container_name: shadowsocks
+    #   environment:
+    #     - SERVER_PORT=8388
+    #     - PASSWORD=fakellm-demo-pwd   # 客户端连接密码
+    #     - METHOD=aes-256-gcm
+    #     - ARGS=--plugin v2ray-plugin --plugin-opts "server"
+    #   ports:
+    #     - "8388:8388"
+    #   restart: unless-stopped
+
+    # ngrok:
+    #   image: ngrok/ngrok:latest
+    #   container_name: ngrok
+    #   restart: unless-stopped
+    #   environment:
+    #     - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}  # 在 .env 文件中配置
+    #   command: "http shadowsocks:8388 --domain=${NGROK_DOMAIN}"
+    #   depends_on:
+    #     - shadowsocks
 
 volumes:
   ollama_data:

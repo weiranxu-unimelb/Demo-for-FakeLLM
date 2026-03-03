@@ -1,7 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ?? "http://localhost:8000";
+// 强制使用 /api 相对路径
+// 本地开发(npm run dev): 由 vite.config.ts 的 proxy 转发到后端
+// 生产环境(docker): 由 nginx.conf 的 location /api/ 转发到后端
+const API_BASE_URL = "/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
